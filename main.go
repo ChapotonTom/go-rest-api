@@ -1,16 +1,23 @@
 package main
 
 import (
-    "database/sql"
-    "fmt"
+    "restapi/config"
     "restapi/users"
-    _ "github.com/mattn/go-sqlite3"
+    "restapi/roles"
+    "github.com/gin-gonic/gin"
 )
 
 func main() {
-    db, _ := sql.Open("sqlite3", "./company.db")
-    users := user.NewUsers(db)
+    db, _ := config.GetDB()
+    user.NewUsers(db)
+    role.NewRoles(db)
+    
+    router := gin.Default()
 
-    allUsers := users.GetAll()
-    fmt.Println(allUsers)
+    router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+
+    user.UserRouter(router)
+
+    router.Run("localhost:8080")
 }

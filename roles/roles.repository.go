@@ -1,39 +1,45 @@
 package role
 
 import (
+	"restapi/config"
 	"database/sql"
 )
 
-type SQLite struct {
-	DB *sql.DB
-}
-
-func (s *SQLite) FindAll() []Role {
+func FindAll() ([]Role, error) {
+	db, _ := config.GetDB()
 	roles := []Role{}
-	rows, _ := s.DB.Query("SELECT * FROM Role")
+	rows, err := db.Query("SELECT * FROM Role")
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		role := Role{}
 		rows.Scan(&role.Id, &role.Userid, &role.Type)
 		roles = append(roles, role)
 	}
-	return roles
+	return roles, nil
 }
 
-func (s *SQLite) FindByUserId(userId int) []Role {
+func FindByUserId(userId int) ([]Role, error) {
+	db, _ := config.GetDB()
 	roles := []Role{}
-	rows, _ := s.DB.Query("SELECT * FROM Role WHERE userId = ?", userId)
+	rows, err := db.Query("SELECT * FROM Role WHERE userId = ?", userId)
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		role := Role{}
 		rows.Scan(&role.Id, &role.Userid, &role.Type)
 		roles = append(roles, role)
 	}
-	return roles
+	return roles, nil
 }
 
-func (s *SQLite) Add(role Role) error {
-    stmt, _ := s.DB.Prepare("INSERT INTO Role(userId, type) values (?, ?)")
+func Add(role Role) error {
+	db, _ := config.GetDB()
+    stmt, _ := db.Prepare("INSERT INTO Role(userId, type) values (?, ?)")
 	_, err := stmt.Exec(role.Userid, role.Type)
 	if err != nil {
 		return err
@@ -41,8 +47,9 @@ func (s *SQLite) Add(role Role) error {
 	return nil
 }
 
-func (s *SQLite) DeleteByUserID(userId int) error {
-    stmt, _ := s.DB.Prepare("DELETE FROM Role WHERE userId = ?")
+func DeleteByUserID(userId int) error {
+	db, _ := config.GetDB()
+    stmt, _ := db.Prepare("DELETE FROM Role WHERE userId = ?")
 	_, err := stmt.Exec(userId)
 	if err != nil {
 		return err
@@ -50,7 +57,7 @@ func (s *SQLite) DeleteByUserID(userId int) error {
 	return nil
 }
 
-func NewRoleTable(connexion *sql.DB) *SQLite {
+func NewRoles(connexion *sql.DB) {
 	stmt, _ := connexion.Prepare(`
 		CREATE TABLE IF NOT EXISTS "Role" (
 			"id"		INTEGER,
@@ -61,7 +68,4 @@ func NewRoleTable(connexion *sql.DB) *SQLite {
 		);
 	`)
 	stmt.Exec()
-	return &SQLite{
-		DB: connexion,
-	}
 }

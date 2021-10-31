@@ -1,45 +1,49 @@
 package user
 
 import (
+	"restapi/config"
 	"database/sql"
 )
 
-type SQLite struct {
-	DB *sql.DB
-}
-
-func (s *SQLite) GetAll() []User {
+func FindAll() ([]User, error) {
+	db, _ := config.GetDB()
 	users := []User{}
-	rows, _ := s.DB.Query("SELECT * FROM User")
+	rows, err := db.Query("SELECT * FROM User")
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		user := User{}
 		rows.Scan(&user.Id, &user.Name, &user.Password)
 		users = append(users, user)
 	}
-	return users
+	return users, nil
 }
 
-func (s *SQLite) FindById(id int) (*User, error) {
+func FindById(id int) (*User, error) {
+	db, _ := config.GetDB()
 	user := User{}
-
-	err := s.DB.QueryRow("SELECT * FROM User WHERE id = ?", id).Scan(&user.Id, &user.Name, &user.Password)
+	err := db.QueryRow("SELECT * FROM User WHERE id = ?", id).Scan(&user.Id, &user.Name, &user.Password)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (s *SQLite) Add(user User) error {
-    stmt, _ := s.DB.Prepare("INSERT INTO User(name, password) values (?, ?)")
-	_, err := stmt.Exec(user.Name, user.Password)
+func Add(user User) (int, error) {
+	db, _ := config.GetDB()
+    stmt, _ := db.Prepare("INSERT INTO User(name, password) values (?, ?)")
+	result, err := stmt.Exec(user.Name, user.Password)
 	if err != nil {
-		return err
+		return -1, err
 	}
-	return nil
+	var id int64
+	id, err = result.LastInsertId()
+	return int(id), nil
 }
 
-func NewUsers(connexion *sql.DB) *SQLite {
+func NewUsers(connexion *sql.DB) {
 	stmt, _ := connexion.Prepare(`
 		CREATE TABLE IF NOT EXISTS "User" (
 			"id"	INTEGER UNIQUE,
@@ -49,7 +53,4 @@ func NewUsers(connexion *sql.DB) *SQLite {
 		);
 	`)
 	stmt.Exec()
-	return &SQLite{
-		DB: connexion,
-	}
 }
