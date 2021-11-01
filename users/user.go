@@ -6,3 +6,9 @@ type User struct {
 	Password string `json:"password" binding:"required"`
 	Roles []string `json:"roles" binding:"max=2"`
 }
+
+type FormatedUser struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Roles []string `json:"roles"`
+}

@@ -5,3 +5,7 @@ type Role struct {
 	Userid int `json:"userId"`
 	Type string `json:"type"`
 }
+
+type RolesUpdate struct {
+	Roles []string `json:"roles" binding:"max=2"`
+}

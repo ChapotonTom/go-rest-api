@@ -47,10 +47,10 @@ func Add(userId int, role string) error {
 	return nil
 }
 
-func DeleteByUserID(userId int) error {
+func Delete(roleId int) error {
 	db, _ := config.GetDB()
-    stmt, _ := db.Prepare("DELETE FROM Role WHERE userId = ?")
-	_, err := stmt.Exec(userId)
+    stmt, _ := db.Prepare("DELETE FROM Role WHERE id = ?")
+	_, err := stmt.Exec(roleId)
 	if err != nil {
 		return err
 	}
