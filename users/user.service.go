@@ -5,6 +5,12 @@ import (
 	"restapi/roles"
 )
 
+type FormatedUser struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Roles []string `json:"roles"`
+}
+
 func filterRoles(roles []role.Role, userId int) []string {
 	rolesFiltered := []string{}
 	for _, role := range roles {
@@ -15,15 +21,15 @@ func filterRoles(roles []role.Role, userId int) []string {
 	return rolesFiltered
 }
 
-func GetUsers() []User {
+func GetUsers() []FormatedUser {
 	users, _ := FindAll()
 	roles, _ := role.FindAll()
 
-	formattedUsers := []User{}
+	formattedUsers := []FormatedUser{}
 
 	for _, user := range users {
 		userRoles := filterRoles(roles, user.Id)
-		newUser := User{
+		newUser := FormatedUser{
 			Id: user.Id,
 			Name: user.Name,
 			Roles: userRoles,
@@ -33,10 +39,10 @@ func GetUsers() []User {
 	return formattedUsers
 }
 
-func GetSingleUser(userId int) User {
+func GetSingleUser(userId int) FormatedUser {
 	user, _ := FindById(userId)
 	roles, _ := role.FindByUserId(userId)
-	return User{
+	return FormatedUser{
 		Id: user.Id,
 		Name: user.Name,
 		Roles: filterRoles(roles, user.Id),
