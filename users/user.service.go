@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"restapi/roles"
+	"restapi/utils"
 )
 
 type FormatedUser struct {
@@ -50,6 +51,11 @@ func GetSingleUser(userId int) FormatedUser {
 }
 
 func CreateUser(newUser User) error {
+	hash, err := utils.HashPassword(newUser.Password)
+	if err != nil {
+		return errors.New("User creation failed")
+	}
+	newUser.Password = hash
 	userId, err := Add(newUser)
 	if err != nil {
 		return errors.New("User creation failed")
