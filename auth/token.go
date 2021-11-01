@@ -2,13 +2,14 @@ package auth
 
 import (
 	"time"
+	"strconv"
 	"github.com/dgrijalva/jwt-go"
 )
 
 func CreateToken(userId int, username string, roles []string) (string, error) {
 	var err error
 	claims := jwt.MapClaims{}
-	claims["userId"] = userId
+	claims["userId"] = strconv.Itoa(userId)
 	claims["username"] = username
 	claims["roles"] = roles
 	claims["expiresAt"] = time.Now().Add(time.Minute * 60).Unix()

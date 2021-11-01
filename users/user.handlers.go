@@ -25,11 +25,9 @@ func HandleGetUsers(c *gin.Context) {
 }
 
 func HandleGetUser(c *gin.Context) {
-	userId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Bad parameters"})
-	}
-	user, err := GetSingleUser(userId)
+	userId, _ := c.Get("userId")
+	id, _ := strconv.Atoi(userId.(string))
+	user, err := GetSingleUser(id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Request Failed"})
 	}

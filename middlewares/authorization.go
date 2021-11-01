@@ -60,7 +60,8 @@ func AuthorizeUser(c *gin.Context) {
 		c.JSON(401, gin.H{"error": "Unauthorized"})
 		c.AbortWithStatus(401)
 	}
-	c.Set("userId", tokenClaims.(jwt.MapClaims)["userId"])
+	userId := tokenClaims.(jwt.MapClaims)["userId"]
+	c.Set("userId", userId)
 }
 
 func AuthorizeManager(c *gin.Context) {
@@ -75,6 +76,8 @@ func AuthorizeManager(c *gin.Context) {
 		c.JSON(401, gin.H{"error": "Unauthorized"})
 		c.AbortWithStatus(401)
 	}
+	userId := tokenClaims.(jwt.MapClaims)["userId"]
+	c.Set("userId", userId)
 }
 
 func AuthorizeEmployee(c *gin.Context) {
@@ -89,4 +92,6 @@ func AuthorizeEmployee(c *gin.Context) {
 		c.JSON(401, gin.H{"error": "Unauthorized"})
 		c.AbortWithStatus(401)
 	}
+	userId := tokenClaims.(jwt.MapClaims)["userId"]
+	c.Set("userId", userId)
 }
