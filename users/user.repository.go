@@ -31,6 +31,16 @@ func FindById(id int) (*User, error) {
 	return &user, nil
 }
 
+func FindByName(username string) (*User, error) {
+	db, _ := config.GetDB()
+	user := User{}
+	err := db.QueryRow("SELECT * FROM User WHERE name = ?", username).Scan(&user.Id, &user.Name, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func Add(user User) (int, error) {
 	db, _ := config.GetDB()
     stmt, _ := db.Prepare("INSERT INTO User(name, password) values (?, ?)")
