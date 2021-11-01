@@ -35,10 +35,15 @@ func sortOutRoles(currentRoles []role.Role, newRoles []string) ([]string, []int)
 	return rolesToCreate, rolesToDeleteIds
 }
 
-func GetUsers() []FormatedUser {
-	users, _ := FindAll()
-	roles, _ := role.FindAll()
-
+func GetUsers() ([]FormatedUser, error) {
+	users, err := FindAll()
+	if err != nil {
+		return nil, errors.New("Request failed")
+	}
+	roles, err := role.FindAll()
+	if err != nil {
+		return nil, errors.New("Request failed")
+	}
 	formattedUsers := []FormatedUser{}
 
 	for _, user := range users {
@@ -50,17 +55,23 @@ func GetUsers() []FormatedUser {
 		};
 		formattedUsers = append(formattedUsers, newUser)
 	}
-	return formattedUsers
+	return formattedUsers, nil
 }
 
-func GetSingleUser(userId int) FormatedUser {
-	user, _ := FindById(userId)
-	roles, _ := role.FindByUserId(userId)
-	return FormatedUser{
+func GetSingleUser(userId int) (*FormatedUser, error) {
+	user, err := FindById(userId)
+	if err != nil {
+		return nil, errors.New("Request failed")
+	}
+	roles, err := role.FindByUserId(userId)
+	if err != nil {
+		return nil, errors.New("Request failed")
+	}
+	return &FormatedUser{
 		Id: user.Id,
 		Name: user.Name,
 		Roles: filterRoles(roles, user.Id),
-	};
+	}, nil;
 }
 
 func CreateUser(newUser User) error {
