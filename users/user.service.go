@@ -1,14 +1,9 @@
 package user
 
 import (
+	"errors"
 	"restapi/roles"
 )
-
-type formatedUser struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	Roles []string `json:"roles"`
-}
 
 func filterRoles(roles []role.Role, userId int) []string {
 	rolesFiltered := []string{}
@@ -20,15 +15,15 @@ func filterRoles(roles []role.Role, userId int) []string {
 	return rolesFiltered
 }
 
-func GetUsers() []formatedUser {
+func GetUsers() []User {
 	users, _ := FindAll()
 	roles, _ := role.FindAll()
 
-	formattedUsers := []formatedUser{}
+	formattedUsers := []User{}
 
 	for _, user := range users {
 		userRoles := filterRoles(roles, user.Id)
-		newUser := formatedUser{
+		newUser := User{
 			Id: user.Id,
 			Name: user.Name,
 			Roles: userRoles,
@@ -38,12 +33,25 @@ func GetUsers() []formatedUser {
 	return formattedUsers
 }
 
-func GetSingleUser(userId int) formatedUser {
+func GetSingleUser(userId int) User {
 	user, _ := FindById(userId)
 	roles, _ := role.FindByUserId(userId)
-	return formatedUser{
+	return User{
 		Id: user.Id,
 		Name: user.Name,
 		Roles: filterRoles(roles, user.Id),
 	};
+}
+
+func CreateUser(newUser User) error {
+	userId, err := Add(newUser)
+	if err != nil {
+		return errors.New("User creation failed")
+	}
+	for _, userRole := range newUser.Roles {
+		if err := role.Add(userId, userRole); err != nil {
+			return errors.New("User's role creation failed")
+		}
+	}
+	return nil
 }

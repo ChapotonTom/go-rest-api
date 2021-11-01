@@ -37,10 +37,10 @@ func FindByUserId(userId int) ([]Role, error) {
 	return roles, nil
 }
 
-func Add(role Role) error {
+func Add(userId int, role string) error {
 	db, _ := config.GetDB()
     stmt, _ := db.Prepare("INSERT INTO Role(userId, type) values (?, ?)")
-	_, err := stmt.Exec(role.Userid, role.Type)
+	_, err := stmt.Exec(userId, role)
 	if err != nil {
 		return err
 	}
