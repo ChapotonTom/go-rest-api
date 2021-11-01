@@ -4,6 +4,21 @@ import (
 	"restapi/database"
 )
 
+func FindAll() ([]User, error) {
+	users := []User{}
+	rows, err := database.DBCon.Query("SELECT * FROM User")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		user := User{}
+		rows.Scan(&user.Id, &user.Name, &user.Password)
+		users = append(users, user)
+	}
+	return users, nil
+}
+
 func FindAllExceptOne(userId int) ([]User, error) {
 	users := []User{}
 	rows, err := database.DBCon.Query("SELECT * FROM User WHERE id != ?", userId)

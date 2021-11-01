@@ -112,3 +112,15 @@ func UpdateUserRoles(userId int, newUserRoles []string) error {
 	}
 	return nil
 }
+
+// create a default user if no user exists
+func FirstUser() {
+	users, err := FindAll()
+	if err != nil || len(users) == 0 {
+		CreateUser(User{
+			Name: "admin",
+			Password: "admin",
+			Roles: []string{"employee", "manager"},
+		})
+	}
+}

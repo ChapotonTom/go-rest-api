@@ -20,6 +20,7 @@ func main() {
         return
     }
     user.NewUsers()
+    user.FirstUser()
     role.NewRoles()
     
     router := gin.Default()

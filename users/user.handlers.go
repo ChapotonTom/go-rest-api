@@ -22,6 +22,7 @@ func HandleGetUsers(c *gin.Context) {
 	users, err := GetOtherUsers(id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Request Failed"})
+		return
 	}
 	c.JSON(200, users)
 }
@@ -32,6 +33,7 @@ func HandleGetUser(c *gin.Context) {
 	user, err := GetSingleUser(id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Request Failed"})
+		return
 	}
 	c.JSON(200, user)
 }
