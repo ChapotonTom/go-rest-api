@@ -17,7 +17,9 @@ func validateRoles(roles []string) error {
 }
 
 func HandleGetUsers(c *gin.Context) {
-	users, err := GetUsers()
+	userId, _ := c.Get("userId")
+	id, _ := strconv.Atoi(userId.(string))
+	users, err := GetOtherUsers(id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Request Failed"})
 	}

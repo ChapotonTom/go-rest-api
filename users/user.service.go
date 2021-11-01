@@ -35,8 +35,8 @@ func sortOutRoles(currentRoles []role.Role, newRoles []string) ([]string, []int)
 	return rolesToCreate, rolesToDeleteIds
 }
 
-func GetUsers() ([]FormatedUser, error) {
-	users, err := FindAll()
+func GetOtherUsers(userId int) ([]FormatedUser, error) {
+	users, err := FindAllExceptOne(userId)
 	if err != nil {
 		return nil, errors.New("Request failed")
 	}

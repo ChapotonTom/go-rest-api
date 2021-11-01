@@ -5,10 +5,10 @@ import (
 	"database/sql"
 )
 
-func FindAll() ([]User, error) {
+func FindAllExceptOne(userId int) ([]User, error) {
 	db, _ := config.GetDB()
 	users := []User{}
-	rows, err := db.Query("SELECT * FROM User")
+	rows, err := db.Query("SELECT * FROM User WHERE id != ?", userId)
 	if err != nil {
 		return nil, err
 	}
