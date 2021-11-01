@@ -57,6 +57,7 @@ func HandleUserUpdate(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Bad parameters"})
+		return
 	}
 	var rolesUpdate role.RolesUpdate
 	if err := c.ShouldBindJSON(&rolesUpdate); err != nil {
@@ -65,6 +66,10 @@ func HandleUserUpdate(c *gin.Context) {
 	}
 	if err := validateRoles(rolesUpdate.Roles); err != nil {
 		c.JSON(400, gin.H{"error": "Bad parameters (wrong role type)"})
+		return
+	}
+	if _, err := FindById(userId); err != nil {
+		c.JSON(404, gin.H{"error": "User not found"})
 		return
 	}
 	if err := UpdateUserRoles(userId, rolesUpdate.Roles); err != nil {

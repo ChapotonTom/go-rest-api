@@ -28,7 +28,7 @@ func sortOutRoles(currentRoles []role.Role, newRoles []string) ([]string, []int)
 		currentRolesString = append(currentRolesString, currentRole.Type)
 	}
 	for _, newRole := range newRoles {
-		if !utils.StringInSlice(newRole, currentRolesString) {
+		if !utils.StringInSlice(newRole, currentRolesString) && !utils.StringInSlice(newRole, rolesToCreate) {
 			rolesToCreate = append(rolesToCreate, newRole)
 		}
 	}
@@ -84,9 +84,13 @@ func CreateUser(newUser User) error {
 	if err != nil {
 		return errors.New("User creation failed")
 	}
+	rolesCreated := []string{} //avoid doubles
 	for _, userRole := range newUser.Roles {
-		if err := role.Add(userId, userRole); err != nil {
-			return errors.New("User's role creation failed")
+		if !utils.StringInSlice(userRole, rolesCreated) {
+			rolesCreated = append(rolesCreated, userRole)
+			if err := role.Add(userId, userRole); err != nil {
+				return errors.New("User role creation failed")
+			}	
 		}
 	}
 	return nil
