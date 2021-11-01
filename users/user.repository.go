@@ -1,14 +1,12 @@
 package user
 
 import (
-	"restapi/config"
-	"database/sql"
+	"restapi/database"
 )
 
 func FindAllExceptOne(userId int) ([]User, error) {
-	db, _ := config.GetDB()
 	users := []User{}
-	rows, err := db.Query("SELECT * FROM User WHERE id != ?", userId)
+	rows, err := database.DBCon.Query("SELECT * FROM User WHERE id != ?", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -22,9 +20,8 @@ func FindAllExceptOne(userId int) ([]User, error) {
 }
 
 func FindById(id int) (*User, error) {
-	db, _ := config.GetDB()
 	user := User{}
-	err := db.QueryRow("SELECT * FROM User WHERE id = ?", id).Scan(&user.Id, &user.Name, &user.Password)
+	err := database.DBCon.QueryRow("SELECT * FROM User WHERE id = ?", id).Scan(&user.Id, &user.Name, &user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -32,9 +29,8 @@ func FindById(id int) (*User, error) {
 }
 
 func FindByName(username string) (*User, error) {
-	db, _ := config.GetDB()
 	user := User{}
-	err := db.QueryRow("SELECT * FROM User WHERE name = ?", username).Scan(&user.Id, &user.Name, &user.Password)
+	err := database.DBCon.QueryRow("SELECT * FROM User WHERE name = ?", username).Scan(&user.Id, &user.Name, &user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +38,7 @@ func FindByName(username string) (*User, error) {
 }
 
 func Add(user User) (int, error) {
-	db, _ := config.GetDB()
-    stmt, _ := db.Prepare("INSERT INTO User(name, password) values (?, ?)")
+    stmt, _ := database.DBCon.Prepare("INSERT INTO User(name, password) values (?, ?)")
 	result, err := stmt.Exec(user.Name, user.Password)
 	if err != nil {
 		return -1, err
@@ -53,8 +48,8 @@ func Add(user User) (int, error) {
 	return int(id), nil
 }
 
-func NewUsers(connexion *sql.DB) {
-	stmt, _ := connexion.Prepare(`
+func NewUsers() {
+		stmt, _ := database.DBCon.Prepare(`
 		CREATE TABLE IF NOT EXISTS "User" (
 			"id"	INTEGER UNIQUE,
 			"name"	TEXT UNIQUE,

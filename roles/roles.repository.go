@@ -1,14 +1,12 @@
 package role
 
 import (
-	"restapi/config"
-	"database/sql"
+	"restapi/database"
 )
 
 func FindAll() ([]Role, error) {
-	db, _ := config.GetDB()
 	roles := []Role{}
-	rows, err := db.Query("SELECT * FROM Role")
+	rows, err := database.DBCon.Query("SELECT * FROM Role")
 	if err != nil {
 		return nil, err
 	}
@@ -22,9 +20,8 @@ func FindAll() ([]Role, error) {
 }
 
 func FindByUserId(userId int) ([]Role, error) {
-	db, _ := config.GetDB()
 	roles := []Role{}
-	rows, err := db.Query("SELECT * FROM Role WHERE userId = ?", userId)
+	rows, err := database.DBCon.Query("SELECT * FROM Role WHERE userId = ?", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +35,7 @@ func FindByUserId(userId int) ([]Role, error) {
 }
 
 func Add(userId int, role string) error {
-	db, _ := config.GetDB()
-    stmt, _ := db.Prepare("INSERT INTO Role(userId, type) values (?, ?)")
+    stmt, _ := database.DBCon.Prepare("INSERT INTO Role(userId, type) values (?, ?)")
 	_, err := stmt.Exec(userId, role)
 	if err != nil {
 		return err
@@ -48,8 +44,7 @@ func Add(userId int, role string) error {
 }
 
 func Delete(roleId int) error {
-	db, _ := config.GetDB()
-    stmt, _ := db.Prepare("DELETE FROM Role WHERE id = ?")
+    stmt, _ := database.DBCon.Prepare("DELETE FROM Role WHERE id = ?")
 	_, err := stmt.Exec(roleId)
 	if err != nil {
 		return err
@@ -57,8 +52,8 @@ func Delete(roleId int) error {
 	return nil
 }
 
-func NewRoles(connexion *sql.DB) {
-	stmt, _ := connexion.Prepare(`
+func NewRoles() {
+	stmt, _ := database.DBCon.Prepare(`
 		CREATE TABLE IF NOT EXISTS "Role" (
 			"id"		INTEGER,
 			"userId"	INTEGER,

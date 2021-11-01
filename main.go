@@ -1,17 +1,26 @@
 package main
 
 import (
-    "restapi/config"
+    "restapi/database"
     "restapi/auth"
     "restapi/users"
     "restapi/roles"
+    "database/sql"
+    "fmt"
+    _ "github.com/mattn/go-sqlite3"
     "github.com/gin-gonic/gin"
 )
 
 func main() {
-    db, _ := config.GetDB()
-    user.NewUsers(db)
-    role.NewRoles(db)
+    var err error
+    database.DBCon, err = sql.Open("sqlite3", "./company.db")
+    if err != nil {
+        dberr := fmt.Errorf("Database connection failed")
+        fmt.Println(dberr.Error())
+        return
+    }
+    user.NewUsers()
+    role.NewRoles()
     
     router := gin.Default()
 
